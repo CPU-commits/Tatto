@@ -55,11 +55,11 @@ async def update_avatar(avatar : UploadFile,tokenData: TokenData = fastapi.Depen
             'body': '',
         }
     )
+
 @router.get(
     '/{id_profile}',
     response_model=Res[str],
     dependencies=[],
-
 )
 async def update_avatar(id_profile : str) -> Res:
     inserted_profile = profiles_service.get_by_id(id_profile, return_json=True)

@@ -13,6 +13,7 @@ from app.dependencies import context
 from datetime import datetime, timedelta
 # Services
 from app.services.users import users_service
+from app.services.profiles import profiles_service
 # Interfaces
 from app.interfaces.auth import Auth as AuthBody
 from app.interfaces.token import TokenRes
@@ -88,6 +89,11 @@ class Auth():
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail='Email o contraseña no coinciden',
             )
+        # If user is tatto artist get profile
+        nickname = user.name
+        if user.role.value is UserTypes.TATTO_ARTIST.value:
+            profile = profiles_service.get_by_id_user(user.id)
+            nickname = profile.nickname
         # Build token
         return TokenRes(
             token=self.__create_access_token(
@@ -98,6 +104,7 @@ class Auth():
                 'name': user.name,
                 'id': str(user.id),
                 'role': user.role.value,
+                'nickname': nickname,
             },
         )
 

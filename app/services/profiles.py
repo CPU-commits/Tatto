@@ -20,6 +20,7 @@ class Profiles():
     #Buscar perfil por el user id 
     def get_by_id_user(self, id: str) -> Profile | None:
         return Profile.objects(user=id).first()
+
     #Buscar perfil por id 
     def get_by_id(self, id: str, return_json=False) -> Profile | None | str:
         profile = Profile.objects(id=id).first()
@@ -51,6 +52,7 @@ class Profiles():
                     )
                 profile.update(**{"push__categories" : inserte_category.id})
         return
+
     #Cambia el avatar del perfil hay que cambiar el api a lo correcto B), o no?
     def update_avatar (self,file : UploadFile,tokenData : TokenData) -> Profile:
         profile = self.get_by_id(tokenData.id)
