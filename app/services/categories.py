@@ -12,7 +12,9 @@ from app.interfaces.category import Category as CategoryBody
 #Services
 
 class Categories():
-   
+    
+    def get_categories(self) -> Category | None:
+        return Category.objects()
     def get_by_id(self, id: str) -> Category | None:
         return Category.objects(id=id).first()
     def get_by_name(self, name: str) -> Category | None:

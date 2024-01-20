@@ -21,7 +21,7 @@ router = fastapi.APIRouter(
     response_class=responses.FileResponse,
     response_description='Download file from AWS S3',
 )
-def update_profile(key: str, background_tasks: BackgroundTasks):
+def get_file(key: str, background_tasks: BackgroundTasks):
     file = files_service.get_file(key)
 
     background_tasks.add_task(file.remove_file)
