@@ -26,10 +26,11 @@ router = fastapi.APIRouter(
 @router.patch(
     '/update',
     response_model=Res[None],
-    dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))],
-
+    dependencies=[
+        fastapi.Depends(auth_service.is_auth),
+        fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST])),
+    ],
 )
-
 async def update_profile(profileUpdate: ProfileUpdate ,tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
     profiles_service.update_profile(profileUpdate,tokenData)
     return responses.JSONResponse(
@@ -41,12 +42,17 @@ async def update_profile(profileUpdate: ProfileUpdate ,tokenData: TokenData = fa
     )
 
 @router.patch(
-    '/update/avatar',
+    '/avatar',
     response_model=Res[None],
-    dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))],
-
+    dependencies=[
+        fastapi.Depends(auth_service.is_auth),
+        fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST])),
+    ],
 )
-async def update_avatar(avatar : UploadFile,tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
+async def update_avatar(
+    avatar: UploadFile,
+    tokenData: TokenData = fastapi.Depends(auth_service.decode_token),
+) -> Res:
     profiles_service.update_avatar(avatar,tokenData)
     return responses.JSONResponse(
         status_code=200,
@@ -62,11 +68,11 @@ async def update_avatar(avatar : UploadFile,tokenData: TokenData = fastapi.Depen
     dependencies=[],
 )
 async def perfil(nickname : str) -> Res:
-    inserted_profile = profiles_service.get_by_nick(nickname, return_json=True)
+    profile = profiles_service.get_by_nick(nickname, return_json=True)
     return responses.JSONResponse(
         status_code=200,
         content = {
             'success': True,
-            'body': inserted_profile
+            'body': profile
         }
     )

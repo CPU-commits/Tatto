@@ -4,10 +4,12 @@ from fastapi.exceptions import HTTPException
 from fastapi import UploadFile
 from uuid import uuid4
 from bson import json_util
+import json
 status = fastapi.status
 
 # Models
 from app.models.profile import Profile
+from app.models.user import User
 # Interfaces
 from app.interfaces.profile import Profile as ProfileBody
 from app.interfaces.profile import ProfileUpdate
@@ -26,7 +28,12 @@ class Profiles():
         profile = Profile.objects(nickname=nickname).first()
 
         if profile is not None and return_json is True:
-            return profile.to_json()
+            profile_data = profile.to_mongo()
+            # Get user
+            user = User.objects(id=profile.user.id).only('email', 'name').first()
+            profile_data['user'] = user.to_mongo()
+
+            return json.loads(json_util.dumps(profile_data))
         return profile
 
     #Crea un perfil al crear el usuario de tipo Tatuador b
@@ -54,11 +61,17 @@ class Profiles():
         return
 
     #Cambia el avatar del perfil hay que cambiar el api a lo correcto B), o no?
-    def update_avatar (self,file : UploadFile,tokenData : TokenData) -> Profile:
+    def update_avatar (self, file: UploadFile, tokenData: TokenData) -> Profile:
         profile = self.get_by_id(tokenData.id)
-        photo = files_service.upload_file(f"{profile.user.id}_avatar.png",file)
+        photo = files_service.upload_file(f"{profile.user.id}_avatar.png", file)
         if profile is not None:
             profile.update(**{"avatar": f"api/{photo}"})
-        return
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='No existe el usuario',
+            )
+
+        return profile
 
 profiles_service = Profiles()
