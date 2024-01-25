@@ -25,7 +25,10 @@ class Profiles():
 
     #Buscar perfil por nick
     def get_by_nick(self, nickname: str, return_json=False) -> Profile | None | str:
-        profile = Profile.objects(nickname=nickname).first()
+        profile: Profile = Profile.objects(nickname=nickname).first()
+        # Set profile avatar
+        profile.avatar = files_service.get_file(profile.avatar)
+
         if profile is not None and return_json is True:
             profile_data = profile.to_mongo()
             # Get user
@@ -59,25 +62,28 @@ class Profiles():
                 profile.update(**{"push__categories" : inserte_category.id})
         return
 
-    #Cambia el avatar del perfil hay que cambiar el api a lo correcto B), o no?
-    def update_avatar (self,file : UploadFile,tokenData : TokenData) -> Profile:
+    # Cambia el avatar del perfil. Retorna la URL de la imagen
+    def update_avatar (self,file : UploadFile,tokenData : TokenData) -> str:
         profile = self.get_by_id_user(tokenData.id)
-        type = file.content_type.split("/")[1]
-        valid_type = ["jpg","png"]
-        if type not in valid_type:
+        type_split = file.content_type.split("/")
+        type = type_split[len(type_split) - 1]
+
+        if "image" not in file.content_type:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='Not valid type',
             )
-        photo = files_service.upload_file(f"Avatars/{profile.nickname}_avatar.{type}",file)
+        image_key = files_service.upload_file(f"Avatars/{profile.nickname}_avatar-{str(uuid4())}.{type}",file)
         if profile is not None:
-            profile.update(**{"avatar": f"api/{photo}"})
+            profile.update(**{"avatar": image_key})
+            # Delete and return file
+            files_service.delete_file(profile.avatar)
+
+            return files_service.get_file(image_key)
         else:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail='No existe el usuario',
             )
-
-        return profile
 
 profiles_service = Profiles()

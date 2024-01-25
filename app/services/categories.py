@@ -22,9 +22,6 @@ class Categories():
 
     def create_category(self, category: CategoryBody) -> Category:
         inserted_category = Category(**category.to_model()).save()
-        return inserted_category.id
-       
-    
-        
+        return inserted_category.id   
 
 categories_service = Categories()

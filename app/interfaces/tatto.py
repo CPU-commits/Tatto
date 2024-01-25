@@ -6,6 +6,7 @@ class Tatto(BaseModel):
     profile: str 
     image : str
     categories : list
+
     def to_model(self):
         return {
             'profile': self.profile,
@@ -14,5 +15,3 @@ class Tatto(BaseModel):
             'categories' : self.categories,
             'date': datetime.utcnow(),
         }
-
-

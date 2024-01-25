@@ -20,5 +20,3 @@ class ProfileUpdate(BaseModel):
     nickname: Optional[str]
     description : Optional[str]
     categories : Optional[List[str]] 
-
-   

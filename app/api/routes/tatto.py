@@ -22,14 +22,35 @@ router = fastapi.APIRouter(
     prefix=f'{configuration.default_api}/tattoos',
 )
 
+@router.get(
+    '/user/{nickname}',
+)
+async def get_user_tattoos(nickname: str) -> Res:
+    tattoos = tattoos_service.get_tattoos_by_nickname(nickname)
+    return responses.JSONResponse(
+        status_code=200,
+        content={
+            'success': True,
+            'body': {
+                'tattoos': tattoos,
+            },
+        },
+    )
+
 @router.post(
     '',
     response_model=Res[None],
-    dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))],
-
+    dependencies=[
+        fastapi.Depends(auth_service.is_auth),
+        fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST])),
+    ],
 )
-async def create_tatto(files : list[UploadFile] ,categories : list = Form(...), tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
-    tattoos_service.create_tatto(files,categories,tokenData)
+async def create_tattoo(
+    files: list[UploadFile],
+    categories: list = Form(...),
+    tokenData: TokenData = fastapi.Depends(auth_service.decode_token),
+) -> Res:
+    tattoos_service.create_tattoo(files,categories,tokenData)
     return responses.JSONResponse(
         status_code=200,
         content = {
@@ -37,4 +58,3 @@ async def create_tatto(files : list[UploadFile] ,categories : list = Form(...), 
             'body': '',
         }
     )
-

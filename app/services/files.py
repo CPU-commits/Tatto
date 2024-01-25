@@ -19,32 +19,29 @@ s3_client = boto3.client(
 )
 bucket = settings.AWS_BUCKET
 
-class TmpFile():
-    filename: str
-    path: str
-
-    def __init__(self, key: str):
-        if os.path.exists('/tmp/files') is False:
-            os.mkdir('/tmp/files')
-        # Set
-        splited = key.split('/')
-        self.filename = splited[len(splited) - 1]
-        # Path
-        self.path = f'/tmp/files/{uuid.uuid4().hex}_{key}'
-        print(self.path)
-
-        s3_client.download_file(bucket, key, self.path)
-
-    def get_path(self):
-        return self.path
-    
-    def get_filename(self):
-        return self.filename
-
-    def remove_file(self):
-        os.unlink(self.path)
-
 class Files():
+    def __init__(self) -> None:
+        s3_client.put_bucket_cors(
+            Bucket=bucket,
+            CORSConfiguration={
+                "CORSRules": [
+                    {
+                        "ID": "tatto",
+                        "AllowedHeaders": [
+                            "*"
+                        ],
+                        "AllowedMethods": [
+                            "GET"
+                        ],
+                        "AllowedOrigins": [
+                            "*"
+                        ],
+                        "ExposeHeaders": []
+                    },
+                ],
+            },
+        )
+
     def upload_file(self, key: str, file: UploadFile) -> str:
         try:
             file.file.seek(0)
@@ -58,7 +55,32 @@ class Files():
         finally:
             file.file.close()
 
-    def get_file(self, key: str):
-        return TmpFile(key)
+    def get_file(self, key: str) -> str:
+        try:
+            return s3_client.generate_presigned_url(
+                "get_object",
+                ExpiresIn=60 * 5,
+                Params={
+                    "Bucket": bucket,
+                    "Key": key,
+                },
+            )
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail='No se encontró el archivo',
+            )
+
+    def delete_file(self, key: str) -> str:
+        try:
+            s3_client.delete_object(
+                Bucket=bucket,
+                Key=key,
+            )
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail='No se pudo eliminar el archivo',
+            )
 
 files_service = Files()

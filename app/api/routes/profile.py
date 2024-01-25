@@ -53,12 +53,12 @@ async def update_avatar(
     avatar: UploadFile,
     tokenData: TokenData = fastapi.Depends(auth_service.decode_token),
 ) -> Res:
-    profiles_service.update_avatar(avatar,tokenData)
+    img_url = profiles_service.update_avatar(avatar,tokenData)
     return responses.JSONResponse(
         status_code=200,
         content = {
             'success': True,
-            'body': '',
+            'body': img_url,
         }
     )
 
