@@ -30,5 +30,7 @@ from app.core.config import configuration
 import fastapi.security as security
 # JWT
 from jose import JWTError, jwt
+# DB
+from app.db.db import uri
 # Services
 from app.services.auth import auth_service

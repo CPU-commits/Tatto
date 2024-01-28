@@ -1,5 +1,5 @@
 from mongoengine import *
-from app.db.db import uri
+from app.dependencies import uri
 # Interfaces
 from app.interfaces.user_types import UserTypes, UserStates
 

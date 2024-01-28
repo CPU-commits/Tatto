@@ -1,5 +1,5 @@
 from mongoengine import *
-from app.db.db import uri
+from app.dependencies import uri
 
 CALENDAR_COLLECTION = 'calendars'
 

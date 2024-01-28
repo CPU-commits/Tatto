@@ -19,6 +19,24 @@ router = fastapi.APIRouter(
     prefix=f'{configuration.default_api}/categories',
 )
 
+@router.get(
+    '',
+    response_model=Res[str],
+    response_description='Obtener todas las categorías',
+)
+async def get_categories():
+    categories = categories_service.get_categories()
+
+    return responses.JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            'success': True,
+            'body': {
+                'categories': categories,
+            },
+        },
+    )
+
 @router.post(
     '',
     response_model=Res[str],

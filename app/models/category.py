@@ -1,7 +1,5 @@
 from mongoengine import *
-from app.db.db import uri
-# Interfaces
-from app.interfaces.user_types import UserTypes, UserStates
+from app.dependencies import uri
 
 CATEGORY_COLLECTION = 'categories'
 

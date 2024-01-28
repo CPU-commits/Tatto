@@ -23,6 +23,7 @@ from app.dependencies import TokenData
 class Posts():
     def get_by_profile(self, profile: str) -> Post:
         return Post.objects(profile=profile)
+
     def create_post(self,files : list[UploadFile],tattos :list  ,categories: list,content:str , tokenData : TokenData) -> Post:
         profile = profiles_service.get_by_id_user(tokenData.id)
         inserted_tattoos = []

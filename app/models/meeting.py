@@ -1,5 +1,5 @@
 from mongoengine import *
-from app.db.db import uri
+from app.dependencies import uri
 from enum import Enum
 from app.models.calendar import Day
 

@@ -1,6 +1,6 @@
 # Responses
 import fastapi
-from fastapi.exceptions import HTTPException
+import json
 
 status = fastapi.status
 # Models
@@ -12,13 +12,14 @@ from app.interfaces.category import Category as CategoryBody
 #Services
 
 class Categories():
-    
-    def get_categories(self) -> Category | None:
-        return Category.objects()
+    def get_categories(self) -> list[Category] | None:
+        return json.loads(Category.objects(state=True).to_json())
+
     def get_by_id(self, id: str) -> Category | None:
         return Category.objects(id=id).first()
-    def get_by_name(self, name: str) -> Category | None:
-        return Category.objects(name=name).first()
+
+    def get_by_slug(self, slug: str) -> Category | None:
+        return Category.objects(slug=slug).first()
 
     def create_category(self, category: CategoryBody) -> Category:
         inserted_category = Category(**category.to_model()).save()

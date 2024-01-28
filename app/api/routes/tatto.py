@@ -25,8 +25,34 @@ router = fastapi.APIRouter(
 @router.get(
     '/user/{nickname}',
 )
-async def get_user_tattoos(nickname: str) -> Res:
-    tattoos = tattoos_service.get_tattoos_by_nickname(nickname)
+async def get_user_tattoos(
+    nickname: str,
+    page: int | None = 0,
+    count: bool | None = False,
+) -> Res:
+    tattoos = tattoos_service.get_tattoos_by_nickname(nickname, page)
+    total_tattoos = None
+    if count:
+        total_tattoos = tattoos_service.count_max_tattoos(nickname)
+
+    return responses.JSONResponse(
+        status_code=200,
+        content={
+            'success': True,
+            'body': {
+                'tattoos': tattoos,
+            },
+        },
+        headers={
+            'X-Count': str(total_tattoos if total_tattoos is not None else 0),
+        },
+    )
+
+@router.get(
+    '/user/{nickname}/latest',
+)
+async def get_latest_user_tattoos(nickname: str) -> Res:
+    tattoos = tattoos_service.get_latest_tattoos_by_nickname(nickname)
     return responses.JSONResponse(
         status_code=200,
         content={
