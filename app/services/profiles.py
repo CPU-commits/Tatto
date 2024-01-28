@@ -28,7 +28,6 @@ class Profiles():
         profile: Profile = Profile.objects(nickname=nickname).first()
         # Set profile avatar
         profile.avatar = files_service.get_file(profile.avatar)
-
         if profile is not None and return_json is True:
             profile_data = profile.to_mongo()
             # Get user
