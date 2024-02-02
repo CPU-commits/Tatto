@@ -99,7 +99,7 @@ class Tattoos():
         if len(result) == 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail='Not valid categories',
+                detail='Not valid categories',  
             )
         # Upload all files to image repo
         tattoos = []

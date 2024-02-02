@@ -40,7 +40,7 @@ async def get_categories():
 @router.post(
     '',
     response_model=Res[str],
-    response_description='El ID del dato insertado',
+    response_description='Crear categoria',
     dependencies=[
         fastapi.Depends(auth_service.is_auth),
         fastapi.Depends(auth_service.roles([UserTypes.ADMIN])),

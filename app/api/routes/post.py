@@ -2,7 +2,7 @@
 from app.dependencies import fastapi
 from app.dependencies import responses
 status = fastapi.status
-from fastapi import Form, Query
+from fastapi import Form, Query,UploadFile
 
 # Interfaces
 from app.dependencies import Res
@@ -28,10 +28,10 @@ router = fastapi.APIRouter(
     dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))],
 )
 async def create_post(
-                    #   tattos : list  = Form(...), 
-                      content : str = Form(...),
-                      tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
-    posts_service.create_post(content,tokenData)    
+                    files: list[UploadFile] | None = None,
+                    content : str = Form(...),
+                    tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
+    posts_service.create_post(files,content,tokenData)    
     return responses.JSONResponse(
         status_code=200,
         content = { 
