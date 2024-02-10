@@ -26,6 +26,15 @@ from app.services.profiles import profiles_service
 from app.dependencies import TokenData
 
 class Posts():
+    def get_post_by_id(self,id :str,return_json=False)->Post:
+        post = Post.objects(id=id).first()
+        if id is not None and return_json is True:
+            return json.loads(post.to_json())
+        return post
+       
+    
+    
+    
     def get_by_profile(self, profile: str) -> Post:
         return list(Post.objects().aggregate([
             {
@@ -147,4 +156,10 @@ class Posts():
             return []
         return json.loads(json_util.dumps(mod_post[start:end]))
 
+    def like_post (self, bool : bool,id_post) ->Post |None | str:
+        post = self.get_post_by_id(id_post)
+        if bool:
+            post.update(**{"likes" : post.likes + 1})
+        else:
+            post.update(**{"likes" : post.likes - 1})
 posts_service = Posts()

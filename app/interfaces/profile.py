@@ -10,7 +10,6 @@ class Profile(BaseModel):
         return {
             'user': self.user,
             'nickname': self.nickname,
-            'likes' : 0,   
             'categories' : [],
             'date': datetime.utcnow(),
         }
@@ -20,3 +19,4 @@ class ProfileUpdate(BaseModel):
     nickname: Optional[str]
     description : Optional[str]
     categories : Optional[List[str]] 
+    likes : Optional[List[str]]
