@@ -87,21 +87,7 @@ class Profiles():
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail='No existe el usuario',
             )
-    def like(self, id_post: str, tokenData: TokenData) -> Profile:
-        print(id_post, tokenData.id)
-        profile = self.get_by_id_user(tokenData.id)
-        likes = [str(like.id) for like in profile.likes]
 
-        if id_post in likes:
-            likes.remove(id_post)
-            profile.likes = [ObjectId(like_id) for like_id in likes]
-            profile.save()
-            return False
-
-        else:
-            likes.append(id_post)
-            profile.likes = [ObjectId(like_id) for like_id in likes]
-            profile.save()
-            return True
+   
             
 profiles_service = Profiles()

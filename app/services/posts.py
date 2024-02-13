@@ -156,10 +156,5 @@ class Posts():
             return []
         return json.loads(json_util.dumps(mod_post[start:end]))
 
-    def like_post (self, bool : bool,id_post) ->Post |None | str:
-        post = self.get_post_by_id(id_post)
-        if bool:
-            post.update(**{"likes" : post.likes + 1})
-        else:
-            post.update(**{"likes" : post.likes - 1})
+   
 posts_service = Posts()
