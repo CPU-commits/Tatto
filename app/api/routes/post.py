@@ -2,7 +2,7 @@
 from app.dependencies import fastapi
 from app.dependencies import responses
 status = fastapi.status
-from fastapi import Form, Query
+from fastapi import Form, Query,UploadFile
 
 # Interfaces
 from app.dependencies import Res
@@ -14,6 +14,8 @@ from app.dependencies import TokenData, UserTypes
 
 from app.dependencies import auth_service
 from app.services.posts import posts_service
+
+from app.services.likes import likes_service
 # Settings
 
 from app.core.config import configuration
@@ -28,10 +30,10 @@ router = fastapi.APIRouter(
     dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))],
 )
 async def create_post(
-                    #   tattos : list  = Form(...), 
-                      content : str = Form(...),
-                      tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
-    posts_service.create_post(content,tokenData)    
+                    files: list[UploadFile] | None = None,
+                    content : str = Form(...),
+                    tokenData: TokenData = fastapi.Depends(auth_service.decode_token)) -> Res:
+    posts_service.create_post(files,content,tokenData)    
     return responses.JSONResponse(
         status_code=200,
         content = { 
@@ -66,4 +68,44 @@ async def get_posts(
         headers={
             'X-Count': str(count_posts),
         },
+    )
+
+@router.get(
+    '/post/{id_post}',
+    response_model=Res[str],
+)
+async def get_post(
+    id_post: str,
+    
+) -> Res:
+    inserted_post = posts_service.get_post_by_id(id_post,return_json=True)
+    
+
+    return responses.JSONResponse(
+        status_code=200,
+        content = {
+            'success': True,
+            'body': {
+                "post" : inserted_post
+            },
+        },
+    )
+
+@router.post(
+    '/like',
+    response_model=Res[str],
+    dependencies=[fastapi.Depends(auth_service.is_auth)]
+)
+async def like_post(
+    id_post : str = Form(...),
+    tokenData: TokenData = fastapi.Depends(auth_service.decode_token)
+) -> Res:
+    likes_service.like_post(id_post,tokenData)
+
+    return responses.JSONResponse(
+        status_code=200,
+        content = {
+            'success': True,
+            'body': ""
+        }
     )

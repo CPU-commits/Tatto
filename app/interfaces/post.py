@@ -1,15 +1,17 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
+
 
 
 class Post(BaseModel):
     profile: str 
-    # tatto : list
+    images : Optional[list]
     content : str
     def to_model(self):
         return {
             'profile': self.profile,
-            # 'tatto': self.tatto,
+            'images': self.images,
             'likes' : 0,   
             'content' : self.content,
             'date': datetime.utcnow(),

@@ -9,7 +9,7 @@ class Profile(Document):
     user = ReferenceField('User', required=True)
     description = StringField(required=False, max_length=150)
     avatar = StringField(required=False)
-    likes = IntField(min_value=0, default=0)
+    likes = ListField(ReferenceField('Like', required=False))
     categories = ListField(ReferenceField('Category', required=False))
     nickname = StringField(required=True, max_length=50, unique=True)
     date = DateField(required=True)

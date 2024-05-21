@@ -18,6 +18,7 @@ from app.api.routes.files import router as files_router
 from app.api.routes.tatto import router as tattoos_router
 from app.api.routes.post import router as posts_router
 from app.api.routes.calendar import router as calendar_router
+from app.api.routes.likes import router as likes_router
 # Settings & Config
 from app.dependencies import settings, configuration
 
@@ -125,3 +126,4 @@ app.include_router(files_router)
 app.include_router(tattoos_router)
 app.include_router(posts_router)
 app.include_router(calendar_router)
+app.include_router(likes_router)

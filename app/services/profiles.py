@@ -3,7 +3,8 @@ import fastapi
 from fastapi.exceptions import HTTPException
 from fastapi import UploadFile
 from uuid import uuid4
-from bson import json_util
+from bson import json_util,ObjectId
+
 import json
 status = fastapi.status
 
@@ -22,7 +23,9 @@ class Profiles():
     #Buscar perfil por el user id 
     def get_by_id_user(self, id: str) -> Profile | None:
         return Profile.objects(user=id).first()
-
+    def get_likes(self, id: str )-> Profile | None | str:
+        profile :Profile =  Profile.objects(user=id).first()
+        return profile.likes
     #Buscar perfil por nick
     def get_by_nick(self, nickname: str, return_json=False) -> Profile | None | str:
         profile: Profile = Profile.objects(nickname=nickname).first()
@@ -85,4 +88,6 @@ class Profiles():
                 detail='No existe el usuario',
             )
 
+   
+            
 profiles_service = Profiles()
