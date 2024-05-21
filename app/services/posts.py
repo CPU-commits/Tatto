@@ -136,11 +136,11 @@ class Posts():
         return Post.objects(profile=profile.id).count()
 
     def get_posts_by_perfil(
-    self,
-    page: int,
-    items_per_page: int,
-    nickname: str,
-) -> list[Post]:
+        self,
+        page: int,
+        items_per_page: int,
+        nickname: str,
+    ) -> list[Post]:
         start = (page - 1) * items_per_page
         end = start + items_per_page
         profile = profiles_service.get_by_nick(nickname)
@@ -148,8 +148,9 @@ class Posts():
         mod_post = []
     
         for post in posts:
-            for i in range(len(post['images'])):
-                post['images'][i] = image_service.get_signed_url(post['images'][i])
+            if 'images' in post:
+                for i in range(len(post['images'])):
+                    post['images'][i] = image_service.get_signed_url(post['images'][i])
             mod_post.append(post)
 
         if not mod_post:
