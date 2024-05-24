@@ -15,8 +15,9 @@ from app.models.post import Post
 from app.models.profile import Profile
 from app.models.user import User
 # Interfaces
-from app.interfaces.post import Post as PostBody
+from app.interfaces.post import PostUpdate, Post as PostBody
 from app.services.image import image_service
+
 
 
 from app.services.profiles import profiles_service
@@ -188,7 +189,21 @@ class Posts():
                             ),
                         )
         post.delete()
-        
+    
+    def update_post(self,id_post:str,postUpdate: PostUpdate) ->Post:
+            # profile.update(**{"nickname": profileUpdate.nickname})
+
+        post = self.get_post_by_id(id=id_post)
+        if post is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Not valid post',
+            )
+        if postUpdate.content is not None:
+            post.update(**{"content": postUpdate.content})
+        if postUpdate.is_visible is not None:
+            post.update(**{"is_visible": postUpdate.is_visible})
+        return
 
         
    

@@ -17,4 +17,8 @@ class Post(BaseModel):
             'date': datetime.utcnow(),
         }
 
+class PostUpdate(BaseModel):
+    content: Optional[str]
+    is_visible: Optional[bool]
+   
 

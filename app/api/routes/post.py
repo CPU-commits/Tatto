@@ -6,7 +6,7 @@ from fastapi import Form, Query,UploadFile
 
 # Interfaces
 from app.dependencies import Res
-
+from app.interfaces.post import PostUpdate 
 import json
 # JWT
 from app.dependencies import TokenData, UserTypes
@@ -110,12 +110,12 @@ async def like_post(
     )
 
 @router.delete(
-    '',
+    '/{id}',
     response_model=Res[str],
     dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))]
 )
 async def delete_post(
-    id : str = Form(...),
+    id : str ,
     tokenData: TokenData = fastapi.Depends(auth_service.decode_token)
 ) -> Res:
 
@@ -129,20 +129,21 @@ async def delete_post(
     )
 
 @router.patch(
-    '',
+    '/{id}',
     response_model=Res[str],
     dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))]
 )
-async def delete_post(
-    id : str = Form(...),
+async def update_post(
+    id : str,
+    postUpdate: PostUpdate ,
     tokenData: TokenData = fastapi.Depends(auth_service.decode_token)
 ) -> Res:
 
-    posts_service.delete_post(id)
+    posts_service.update_post(id,postUpdate)
     return responses.JSONResponse(
         status_code=200,
         content = {
             'success': True,
-            'body': "Post eliminado con exito"
+            'body': "Post fue actualizado con exito"
         }
     )
