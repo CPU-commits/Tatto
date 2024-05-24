@@ -79,7 +79,6 @@ async def get_post(
     
 ) -> Res:
     inserted_post = posts_service.get_post_by_id(id_post,return_json=True)
-    
 
     return responses.JSONResponse(
         status_code=200,
@@ -107,5 +106,43 @@ async def like_post(
         content = {
             'success': True,
             'body': ""
+        }
+    )
+
+@router.delete(
+    '',
+    response_model=Res[str],
+    dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))]
+)
+async def delete_post(
+    id : str = Form(...),
+    tokenData: TokenData = fastapi.Depends(auth_service.decode_token)
+) -> Res:
+
+    posts_service.delete_post(id)
+    return responses.JSONResponse(
+        status_code=200,
+        content = {
+            'success': True,
+            'body': "Post eliminado con exito"
+        }
+    )
+
+@router.patch(
+    '',
+    response_model=Res[str],
+    dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))]
+)
+async def delete_post(
+    id : str = Form(...),
+    tokenData: TokenData = fastapi.Depends(auth_service.decode_token)
+) -> Res:
+
+    posts_service.delete_post(id)
+    return responses.JSONResponse(
+        status_code=200,
+        content = {
+            'success': True,
+            'body': "Post eliminado con exito"
         }
     )

@@ -106,6 +106,18 @@ class Posts():
 
         return image_key
 
+    def _delete_image(
+            self,
+            id: str
+    ) -> str:
+        res = image_service.delete(id)
+        if res is None:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Hubo un error al intentar eliminar la imagen",
+            )
+        return res
+
     def create_post(self, files: list[UploadFile],content:str , tokenData : TokenData) -> Post:
         profile = profiles_service.get_by_id_user(tokenData.id)
         if profile is None:
@@ -157,5 +169,27 @@ class Posts():
             return []
         return json.loads(json_util.dumps(mod_post[start:end]))
 
+    def delete_post(self,id_post : str) -> Post:
+        post = self.get_post_by_id(id=id_post)
+        if post is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Not valid post',
+            )
+        if post.images is not None:
+            with futures.ThreadPoolExecutor(10) as executor:
+                    futures_to_process = []
+                    for image in post.images:
+                        split_id = image.split("/")[4]
+                        futures_to_process.append(
+                            executor.submit(
+                                self._delete_image,
+                                split_id,
+                            ),
+                        )
+        post.delete()
+        
+
+        
    
 posts_service = Posts()

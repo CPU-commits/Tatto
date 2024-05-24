@@ -70,5 +70,11 @@ class ImageService():
         url = url_parts._replace(query=urlencode(query_params, doseq=True)).geturl()
 
         return url
+    
+    def delete (self,id: str) -> str:
+        url = self._url+"/"+id
+        response = requests.delete(url, headers=self._headers)
+        if response.ok is False:
+            return None
 
 image_service = ImageService()
