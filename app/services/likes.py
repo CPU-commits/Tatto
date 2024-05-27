@@ -66,6 +66,10 @@ class Likes():
         profile.likes = likes
         profile.save()
         return 
-
+    
+    def delete_likes(self,id_post: str)->Like:
+        likes = Like.objects(post=id_post)
+        for like in likes:
+            like.delete()
 
 likes_service = Likes()

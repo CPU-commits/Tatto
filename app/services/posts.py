@@ -188,6 +188,7 @@ class Posts():
                                 split_id,
                             ),
                         )
+                        
         post.delete()
     
     def update_post(self,id_post:str,postUpdate: PostUpdate) ->Post:
@@ -202,7 +203,11 @@ class Posts():
         if postUpdate.content is not None:
             post.update(**{"content": postUpdate.content})
         if postUpdate.is_visible is not None:
-            post.update(**{"is_visible": postUpdate.is_visible})
+            if(postUpdate.is_visible):
+                post.update(**{"is_visible": False})
+            else:
+                post.update(**{"is_visible": True})
+
         return
 
         

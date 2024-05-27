@@ -120,6 +120,7 @@ async def delete_post(
 ) -> Res:
 
     posts_service.delete_post(id)
+    likes_service.delete_likes(id)
     return responses.JSONResponse(
         status_code=200,
         content = {
