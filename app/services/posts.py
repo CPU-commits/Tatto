@@ -17,9 +17,6 @@ from app.models.user import User
 # Interfaces
 from app.interfaces.post import PostUpdate, Post as PostBody
 from app.services.image import image_service
-
-
-
 from app.services.profiles import profiles_service
 
 
@@ -140,7 +137,7 @@ class Posts():
                 for future in futures.as_completed(futures_to_process):
                     inserted_images.append(future.result())
         
-        post = PostBody(profile = str(profile.id), images=inserted_images,content = content)
+        post = PostBody(profile = str(profile.id), images=inserted_images,content = content,position = len(self.get_by_profile(profile.id)) + 1)
         Post(**post.to_model()).save()
 
     def count_posts_profile(self, nickname: str) -> int:
@@ -153,11 +150,12 @@ class Posts():
         page: int,
         items_per_page: int,
         nickname: str,
+        query: str,
     ) -> list[Post]:
         start = (page - 1) * items_per_page
         end = start + items_per_page
         profile = profiles_service.get_by_nick(nickname)
-        posts = self.get_by_profile(profile.id)[::-1]
+        posts = self.get_by_profile(profile.id)
         mod_post = []
     
         for post in posts:
@@ -165,10 +163,13 @@ class Posts():
                 for i in range(len(post['images'])):
                     post['images'][i] = image_service.get_signed_url(post['images'][i])
             mod_post.append(post)
+        
+        if query == 'position':
+            mod_post.sort(key=lambda x: x["position"])
 
         if not mod_post:
             return []
-        return json.loads(json_util.dumps(mod_post[start:end]))
+        return json.loads(json_util.dumps(mod_post[start:end][::-1]))
 
     def delete_post(self,id_post : str) -> Post:
         post = self.get_post_by_id(id=id_post)
@@ -200,6 +201,11 @@ class Posts():
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail='Not valid post',
             )
+        
+        if postUpdate.likes is not None: 
+            post.update(**{"likes": postUpdate.likes})
+        if postUpdate.images is not None: 
+            post.update(**{"images": postUpdate.images})
         if postUpdate.content is not None:
             post.update(**{"content": postUpdate.content})
         if postUpdate.is_visible is not None:
@@ -207,9 +213,17 @@ class Posts():
                 post.update(**{"is_visible": False})
             else:
                 post.update(**{"is_visible": True})
-
         return
 
+    def update_position_post(self,posts: list) ->list[Post]:
+        
+        if posts is not None: 
+            index = len(posts)
+            for post in posts:
+                obj_post = self.get_post_by_id(json.loads(post)['_id']['$oid'])
+                obj_post.update(**{"position": index})
+                index -= 1;
+    
         
    
 posts_service = Posts()

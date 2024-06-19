@@ -6,7 +6,7 @@ from fastapi import Form, Query,UploadFile
 
 # Interfaces
 from app.dependencies import Res
-from app.interfaces.post import PostUpdate 
+from app.interfaces.post import PostUpdate, Post
 import json
 # JWT
 from app.dependencies import TokenData, UserTypes
@@ -51,8 +51,10 @@ async def get_posts(
     page: int = Query(default=1, ge=1),
     items_per_page: int = Query(default=10, ge=1),
     count: bool = Query(default=False),
+    query:str = Query(default="position")
 ) -> Res:
-    inserted_posts = posts_service.get_posts_by_perfil(page,items_per_page,nickname)
+    
+    inserted_posts = posts_service.get_posts_by_perfil(page,items_per_page,nickname,query)
     count_posts = 0
     if count:
         count_posts = posts_service.count_posts_profile(nickname)
@@ -141,6 +143,25 @@ async def update_post(
 ) -> Res:
 
     posts_service.update_post(id,postUpdate)
+    return responses.JSONResponse(
+        status_code=200,
+        content = {
+            'success': True,
+            'body': "Post fue actualizado con exito"
+        }
+    )
+
+@router.patch(
+    '/pos/{nickname}',
+    response_model=Res[str],
+    dependencies=[fastapi.Depends(auth_service.is_auth),fastapi.Depends(auth_service.roles([UserTypes.TATTO_ARTIST]))]
+)
+async def update_post_position(
+    nickname: str,
+    posts : list = Form(...),
+    tokenData: TokenData = fastapi.Depends(auth_service.decode_token)
+) -> Res:
+    posts_service.update_position_post(posts)
     return responses.JSONResponse(
         status_code=200,
         content = {
